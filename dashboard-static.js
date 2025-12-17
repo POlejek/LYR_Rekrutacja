@@ -13,8 +13,12 @@ let charts = {};
 
 // Pobranie danych z localStorage
 function getData() {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
+    console.log('Checking localStorage for key:', STORAGE_KEY);
+    const rawData = localStorage.getItem(STORAGE_KEY);
+    console.log('Raw localStorage data:', rawData);
+    const data = rawData ? JSON.parse(rawData) : [];
+    console.log('Parsed data:', data);
+    return data;
 }
 
 // Inicjalizacja
