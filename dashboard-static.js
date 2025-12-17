@@ -104,10 +104,24 @@ function filterData(data) {
 // Załaduj dane dashboardu
 function loadDashboardData() {
     const allData = getData();
+    
+    if (allData.length === 0) {
+        // Brak danych w localStorage - pokaż komunikat
+        document.querySelectorAll('.stat-value').forEach(el => el.textContent = '0');
+        alert('Brak danych w systemie. Dodaj rekrutacje lub zaimportuj dane z pliku JSON.');
+        return;
+    }
+    
     const data = filterData(calculateMetrics(allData));
     
     if (data.length === 0) {
-        alert('Brak danych do wyświetlenia dla wybranych filtrów');
+        // Brak danych dla wybranych filtrów - pokaż zerowe wartości
+        document.querySelectorAll('.stat-value').forEach(el => el.textContent = '0');
+        document.getElementById('departamentyTableBody').innerHTML = '<tr><td colspan="6" class="text-center">Brak danych dla wybranych filtrów</td></tr>';
+        
+        // Wyczyść wykresy
+        Object.values(charts).forEach(chart => chart.destroy());
+        charts = {};
         return;
     }
     
