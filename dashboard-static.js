@@ -105,6 +105,8 @@ function filterData(data) {
 function loadDashboardData() {
     const allData = getData();
     
+    console.log('All data:', allData.length);
+    
     if (allData.length === 0) {
         // Brak danych w localStorage - pokaż komunikat
         document.querySelectorAll('.stat-value').forEach(el => el.textContent = '0');
@@ -112,7 +114,11 @@ function loadDashboardData() {
         return;
     }
     
-    const data = filterData(calculateMetrics(allData));
+    const metricsData = calculateMetrics(allData);
+    console.log('After metrics:', metricsData.length);
+    
+    const data = filterData(metricsData);
+    console.log('After filters:', data.length);
     
     if (data.length === 0) {
         // Brak danych dla wybranych filtrów - pokaż zerowe wartości
