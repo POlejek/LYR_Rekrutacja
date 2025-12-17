@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Statystyk Rekrutacji</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>System Statystyk Rekrutacji</h1>
+            <div class="stats-bar" id="statsBar">
+                <div class="stat-item">
+                    <span class="stat-label">Wszystkie:</span>
+                    <span class="stat-value" id="totalRekrutacje">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Otwarte:</span>
+                    <span class="stat-value" id="otwarteRekrutacje">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Zamknięte:</span>
+                    <span class="stat-value" id="zamknieteRekrutacje">0</span>
+                </div>
+                <div class="stat-item" style="margin-left: auto;">
+                    <a href="/dashboard" class="btn btn-primary">📊 Dashboard</a>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="action-bar">
+                <button class="btn btn-primary" onclick="showAddForm()">➕ Dodaj Rekrutację</button>
+                <button class="btn btn-secondary" onclick="loadRekrutacje()">🔄 Odśwież</button>
+                <button class="btn btn-success" onclick="exportData()">📥 Eksport JSON</button>
+                <button class="btn btn-info" onclick="document.getElementById('importFile').click()">📤 Import JSON</button>
+                <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+            </div>
+
+            <!-- Formularz dodawania/edycji rekrutacji -->
+            <div id="formContainer" class="form-container" style="display: none;">
+                <div class="form-header">
+                    <h2 id="formTitle">Dodaj Nową Rekrutację</h2>
+                    <button class="btn-close" onclick="hideForm()">✕</button>
+                </div>
+                <form id="rekrutacjaForm">
+                    <input type="hidden" id="editId">
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="id_referencyjne">ID Referencyjne *</label>
+                            <input type="text" id="id_referencyjne" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="przyczyna_rekrutacji">Przyczyna Rekrutacji *</label>
+                            <select id="przyczyna_rekrutacji" required onchange="toggleReplacementField()">
+                                <option value="">Wybierz...</option>
+                                <option value="Replacement">Replacement</option>
+                                <option value="New Position">New Position</option>
+                                <option value="Business Growth">Business Growth</option>
+                                <option value="Seasonal">Seasonal</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="replacementGroup" style="display: none;">
+                            <label for="replacement_za_kogo">Replacement za kogo</label>
+                            <input type="text" id="replacement_za_kogo">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="collar_type">Typ Collar *</label>
+                            <select id="collar_type" required>
+                                <option value="">Wybierz...</option>
+                                <option value="White">White Collar</option>
+                                <option value="Blue">Blue Collar</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="czy_manager">Stanowisko *</label>
+                            <select id="czy_manager" required>
+                                <option value="">Wybierz...</option>
+                                <option value="true">Manager</option>
+                                <option value="false">Nie Manager</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="departament">Departament *</label>
+                            <input type="text" id="departament" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dzial">Dział *</label>
+                            <input type="text" id="dzial" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="stanowisko">Stanowisko *</label>
+                            <input type="text" id="stanowisko" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="miejsce_pracy">Miejsce Pracy *</label>
+                            <input type="text" id="miejsce_pracy" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="hiring_manager">Hiring Manager *</label>
+                            <input type="text" id="hiring_manager" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="data_otwarcia">Data Otwarcia *</label>
+                            <input type="date" id="data_otwarcia" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="liczba_cv_otrzymana">Liczba CV Otrzymana</label>
+                            <input type="number" id="liczba_cv_otrzymana" value="0" min="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="liczba_cv_odrzucone_rekruter">Liczba CV Odrzucone (Rekruter)</label>
+                            <input type="number" id="liczba_cv_odrzucone_rekruter" value="0" min="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="liczba_spotkan_rekruter">Liczba Spotkań (Rekruter)</label>
+                            <input type="number" id="liczba_spotkan_rekruter" value="0" min="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="liczba_spotkan_hiring_manager">Liczba Spotkań (Hiring Manager)</label>
+                            <input type="number" id="liczba_spotkan_hiring_manager" value="0" min="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="data_zamkniecia">Data Zamknięcia</label>
+                            <input type="date" id="data_zamkniecia">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="data_zatrudnienia">Data Zatrudnienia</label>
+                            <input type="date" id="data_zatrudnienia">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="typ_zatrudnienia">Typ Zatrudnienia</label>
+                            <select id="typ_zatrudnienia">
+                                <option value="">Wybierz...</option>
+                                <option value="Wewnętrzne">Wewnętrzne</option>
+                                <option value="Zewnętrzne">Zewnętrzne</option>
+                                <option value="Agencja">Agencja</option>
+                                <option value="POL">POL</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="liczba_zatrudnionych">Liczba Zatrudnionych</label>
+                            <input type="number" id="liczba_zatrudnionych" value="0" min="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="liczba_odrzuconych_ofert_przez_kandydata">Liczba Odrzuconych Ofert (Kandydat)</label>
+                            <input type="number" id="liczba_odrzuconych_ofert_przez_kandydata" value="0" min="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="liczba_zlozonych_ofert">Liczba Złożonych Ofert</label>
+                            <input type="number" id="liczba_zlozonych_ofert" value="0" min="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="plec">Płeć</label>
+                            <select id="plec">
+                                <option value="">Wybierz...</option>
+                                <option value="M">Mężczyzna</option>
+                                <option value="K">Kobieta</option>
+                                <option value="Inna">Inna</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="komentarz">Komentarz</label>
+                            <textarea id="komentarz" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Zapisz</button>
+                        <button type="button" class="btn btn-secondary" onclick="hideForm()">Anuluj</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Lista rekrutacji -->
+            <div class="table-container">
+                <table id="rekrutacjeTable">
+                    <thead>
+                        <tr>
+                            <th>ID Ref.</th>
+                            <th>Stanowisko</th>
+                            <th>Departament</th>
+                            <th>Dział</th>
+                            <th>Hiring Manager</th>
+                            <th>Data Otwarcia</th>
+                            <th>Dni Otwarta</th>
+                            <th>Status</th>
+                            <th>Akcje</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rekrutacjeTableBody">
+                        <tr>
+                            <td colspan="9" class="text-center">Ładowanie...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal szczegółów -->
+    <div id="detailsModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Szczegóły Rekrutacji</h2>
+                <button class="btn-close" onclick="closeDetailsModal()">✕</button>
+            </div>
+            <div id="detailsContent" class="details-content"></div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Statystyki Rekrutacji</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div>
+                    <h1>📊 Dashboard Rekrutacyjny</h1>
+                    <p class="subtitle">Statystyki i wskaźniki KPI</p>
+                </div>
+                <div class="header-actions">
+                    <a href="/" class="btn btn-secondary">← Lista Rekrutacji</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Filtry -->
+        <div class="filters-panel">
+            <h3>🔍 Filtry</h3>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label for="dataOd">Data od:</label>
+                    <input type="date" id="dataOd">
+                </div>
+                <div class="filter-group">
+                    <label for="dataDo">Data do:</label>
+                    <input type="date" id="dataDo">
+                </div>
+                <div class="filter-group">
+                    <label for="filterDepartament">Departament:</label>
+                    <select id="filterDepartament">
+                        <option value="">Wszystkie</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterCollar">Typ Collar:</label>
+                    <select id="filterCollar">
+                        <option value="">Wszystkie</option>
+                        <option value="White">White Collar</option>
+                        <option value="Blue">Blue Collar</option>
+                    </select>
+                </div>
+                <div class="filter-actions">
+                    <button class="btn btn-primary" onclick="applyFilters()">Zastosuj</button>
+                    <button class="btn btn-secondary" onclick="resetFilters()">Resetuj</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-icon">📋</div>
+                <div class="kpi-content">
+                    <div class="kpi-label">Wszystkie Rekrutacje</div>
+                    <div class="kpi-value" id="kpiTotal">-</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">🟢</div>
+                <div class="kpi-content">
+                    <div class="kpi-label">Otwarte</div>
+                    <div class="kpi-value" id="kpiOtwarte">-</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">✅</div>
+                <div class="kpi-content">
+                    <div class="kpi-label">Z Zatrudnieniem</div>
+                    <div class="kpi-value" id="kpiZatrudnienie">-</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">⏱️</div>
+                <div class="kpi-content">
+                    <div class="kpi-label">Średni TTF (dni)</div>
+                    <div class="kpi-value" id="kpiTTF">-</div>
+                    <div class="kpi-sub">Mediana: <span id="kpiTTFMedian">-</span></div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">🎯</div>
+                <div class="kpi-content">
+                    <div class="kpi-label">Średni TTO (dni)</div>
+                    <div class="kpi-value" id="kpiTTO">-</div>
+                    <div class="kpi-sub">Mediana: <span id="kpiTTOMedian">-</span></div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">📈</div>
+                <div class="kpi-content">
+                    <div class="kpi-label">Wskaźnik Akceptacji Ofert</div>
+                    <div class="kpi-value" id="kpiOfferAcceptance">-</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">🔄</div>
+                <div class="kpi-content">
+                    <div class="kpi-label">Konwersja CV → Spotkania</div>
+                    <div class="kpi-value" id="kpiCVConversion">-</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">💼</div>
+                <div class="kpi-content">
+                    <div class="kpi-label">Wskaźnik Skuteczności</div>
+                    <div class="kpi-value" id="kpiSuccessRate">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <div class="chart-row">
+                <div class="chart-container">
+                    <h3>Rozkład Rekrutacji po Departamentach</h3>
+                    <canvas id="departamentyChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Przyczyny Rekrutacji</h3>
+                    <canvas id="przyczynyChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-row">
+                <div class="chart-container">
+                    <h3>White vs Blue Collar</h3>
+                    <canvas id="collarChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Źródła Rekrutacji</h3>
+                    <canvas id="zrodlaChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-row">
+                <div class="chart-container full-width">
+                    <h3>Lejek Konwersji Rekrutacyjnej</h3>
+                    <canvas id="funnelChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabela szczegółowa -->
+        <div class="detailed-stats">
+            <h3>📊 Statystyki Szczegółowe</h3>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-title">CV</div>
+                    <div class="stat-number" id="statCV">-</div>
+                    <div class="stat-desc">Otrzymane CV</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-title">Spotkania</div>
+                    <div class="stat-number" id="statSpotkan">-</div>
+                    <div class="stat-desc">Wszystkie spotkania</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-title">Oferty</div>
+                    <div class="stat-number" id="statOfert">-</div>
+                    <div class="stat-desc">Złożone oferty</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-title">Zatrudnienia</div>
+                    <div class="stat-number" id="statZatrudnien">-</div>
+                    <div class="stat-desc">Zakończone sukcesem</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-title">Rotacja</div>
+                    <div class="stat-number" id="statRotacja">-</div>
+                    <div class="stat-desc">Wskaźnik replacement</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-title">Efektywność</div>
+                    <div class="stat-number" id="statEfektywnosc">-</div>
+                    <div class="stat-desc">Spotkań/zatrudnienie</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabela departamentów -->
+        <div class="table-container">
+            <h3>Statystyki po Departamentach</h3>
+            <table id="departamentyTable">
+                <thead>
+                    <tr>
+                        <th>Departament</th>
+                        <th>Wszystkie</th>
+                        <th>Otwarte</th>
+                        <th>Zamknięte</th>
+                        <th>Z Zatrudnieniem</th>
+                        <th>Wskaźnik Sukcesu</th>
+                    </tr>
+                </thead>
+                <tbody id="departamentyTableBody">
+                    <tr>
+                        <td colspan="6" class="text-center">Ładowanie...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="/static/dashboard.js"></script>
+</body>
+</html>
