@@ -93,8 +93,8 @@ function calculateMetrics(rekrutacje) {
         const wskaznik_akceptacji = r.liczba_zlozonych_ofert > 0 ? 
             ((r.liczba_zlozonych_ofert - (r.liczba_odrzuconych_ofert || 0)) / r.liczba_zlozonych_ofert * 100).toFixed(1) : null;
         
-        const wskaznik_konwersji = r.liczba_otrzymanych_cv > 0 ? 
-            ((r.liczba_spotkan_rekrutera + r.liczba_spotkan_hm) / r.liczba_otrzymanych_cv * 100).toFixed(1) : null;
+        const wskaznik_konwersji = r.liczba_cv_otrzymana > 0 ? 
+            ((r.liczba_spotkan_rekruter + r.liczba_spotkan_hiring_manager) / r.liczba_cv_otrzymana * 100).toFixed(1) : null;
         
         return { ...r, ttf, tto, wskaznik_akceptacji, wskaznik_konwersji };
     });
@@ -114,7 +114,7 @@ function filterData(data) {
         filtered = filtered.filter(r => r.departament === currentFilters.departament);
     }
     if (currentFilters.collarType) {
-        filtered = filtered.filter(r => r.typ_collar === currentFilters.collarType);
+        filtered = filtered.filter(r => r.collar_type === currentFilters.collarType);
     }
     
     return filtered;
@@ -177,8 +177,8 @@ function calculateDashboardStats(data) {
     const totalOdrzucone = data.reduce((sum, r) => sum + (r.liczba_odrzuconych_ofert || 0), 0);
     const wskaznik_akceptacji = totalOferty > 0 ? ((totalOferty - totalOdrzucone) / totalOferty * 100).toFixed(1) : 0;
     
-    const totalCV = data.reduce((sum, r) => sum + (r.liczba_otrzymanych_cv || 0), 0);
-    const totalSpotkan = data.reduce((sum, r) => sum + (r.liczba_spotkan_rekrutera || 0) + (r.liczba_spotkan_hm || 0), 0);
+    const totalCV = data.reduce((sum, r) => sum + (r.liczba_cv_otrzymana || 0), 0);
+    const totalSpotkan = data.reduce((sum, r) => sum + (r.liczba_spotkan_rekruter || 0) + (r.liczba_spotkan_hiring_manager || 0), 0);
     const konwersja_cv = totalCV > 0 ? (totalSpotkan / totalCV * 100).toFixed(1) : 0;
     
     const wskaznik_skutecznosci = total > 0 ? (zZatrudnieniem / total * 100).toFixed(1) : 0;
@@ -209,8 +209,8 @@ function calculateDashboardStats(data) {
     // Collar type
     const collar = { 'White': 0, 'Blue': 0 };
     data.forEach(r => {
-        if (collar[r.typ_collar] !== undefined) {
-            collar[r.typ_collar]++;
+        if (collar[r.collar_type] !== undefined) {
+            collar[r.collar_type]++;
         }
     });
     
@@ -414,8 +414,8 @@ function updateLejekChart(data) {
         charts.lejek.destroy();
     }
     
-    const totalCV = data.rekrutacje.reduce((sum, r) => sum + (r.liczba_otrzymanych_cv || 0), 0);
-    const totalSpotkan = data.rekrutacje.reduce((sum, r) => sum + (r.liczba_spotkan_rekrutera || 0) + (r.liczba_spotkan_hm || 0), 0);
+    const totalCV = data.rekrutacje.reduce((sum, r) => sum + (r.liczba_cv_otrzymana || 0), 0);
+    const totalSpotkan = data.rekrutacje.reduce((sum, r) => sum + (r.liczba_spotkan_rekruter || 0) + (r.liczba_spotkan_hiring_manager || 0), 0);
     const totalOfert = data.rekrutacje.reduce((sum, r) => sum + (r.liczba_zlozonych_ofert || 0), 0);
     const totalZatrudnionych = data.rekrutacje.reduce((sum, r) => sum + (r.liczba_zatrudnionych || 0), 0);
     
@@ -451,8 +451,8 @@ function updateLejekChart(data) {
 
 // Aktualizuj szczegółowe statystyki
 function updateDetailedStats(data) {
-    const totalCV = data.rekrutacje.reduce((sum, r) => sum + (r.liczba_otrzymanych_cv || 0), 0);
-    const totalSpotkan = data.rekrutacje.reduce((sum, r) => sum + (r.liczba_spotkan_rekrutera || 0) + (r.liczba_spotkan_hm || 0), 0);
+    const totalCV = data.rekrutacje.reduce((sum, r) => sum + (r.liczba_cv_otrzymana || 0), 0);
+    const totalSpotkan = data.rekrutacje.reduce((sum, r) => sum + (r.liczba_spotkan_rekruter || 0) + (r.liczba_spotkan_hiring_manager || 0), 0);
     const totalOfert = data.rekrutacje.reduce((sum, r) => sum + (r.liczba_zlozonych_ofert || 0), 0);
     const totalZatrudnionych = data.rekrutacje.reduce((sum, r) => sum + (r.liczba_zatrudnionych || 0), 0);
     
@@ -489,7 +489,7 @@ function updateDepartamentyTable(data) {
             stats.ttfSum += r.ttf;
             stats.ttfCount++;
         }
-        stats.cvSum += r.liczba_otrzymanych_cv || 0;
+        stats.cvSum += r.liczba_cv_otrzymana || 0;
     });
     
     Object.entries(departamentyStats).forEach(([dep, stats]) => {
