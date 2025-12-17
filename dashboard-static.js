@@ -264,11 +264,9 @@ function updateKPIs(data) {
     document.getElementById('kpiTTO').textContent = data.avg_tto ? `${data.avg_tto}` : 'N/A';
     document.getElementById('kpiTTOMedian').textContent = data.median_tto ? `${data.median_tto}` : 'N/A';
     
-    document.getElementById('kpiAkceptacja').textContent = `${data.wskaznik_akceptacji_ofert}%`;
-    document.getElementById('kpiKonwersja').textContent = `${data.konwersja_cv_spotkania}%`;
-    document.getElementById('kpiSkutecznosc').textContent = `${data.wskaznik_skutecznosci}%`;
-    document.getElementById('kpiRotacja').textContent = `${data.wskaznik_rotacji}%`;
-    document.getElementById('kpiAvgSpotkan').textContent = data.avg_spotkan_na_zatrudnienie;
+    document.getElementById('kpiOfferAcceptance').textContent = `${data.wskaznik_akceptacji_ofert}%`;
+    document.getElementById('kpiCVConversion').textContent = `${data.konwersja_cv_spotkania}%`;
+    document.getElementById('kpiSuccessRate').textContent = `${data.wskaznik_skutecznosci}%`;
 }
 
 // Aktualizuj wykresy
@@ -281,7 +279,7 @@ function updateCharts(data) {
 }
 
 function updateDepartamentyChart(departamenty) {
-    const ctx = document.getElementById('chartDepartamenty').getContext('2d');
+    const ctx = document.getElementById('departamentyChart').getContext('2d');
     
     if (charts.departamenty) {
         charts.departamenty.destroy();
@@ -313,7 +311,7 @@ function updateDepartamentyChart(departamenty) {
 }
 
 function updatePrzyczinyChart(przyczyny) {
-    const ctx = document.getElementById('chartPrzyczyny').getContext('2d');
+    const ctx = document.getElementById('przyczynyChart').getContext('2d');
     
     if (charts.przyczyny) {
         charts.przyczyny.destroy();
@@ -345,7 +343,7 @@ function updatePrzyczinyChart(przyczyny) {
 }
 
 function updateCollarChart(collar) {
-    const ctx = document.getElementById('chartCollar').getContext('2d');
+    const ctx = document.getElementById('collarChart').getContext('2d');
     
     if (charts.collar) {
         charts.collar.destroy();
@@ -372,7 +370,7 @@ function updateCollarChart(collar) {
 }
 
 function updateTypZatrudnieniaChart(typZatrudnienia) {
-    const ctx = document.getElementById('chartTypZatrudnienia').getContext('2d');
+    const ctx = document.getElementById('zrodlaChart').getContext('2d');
     
     if (charts.typZatrudnienia) {
         charts.typZatrudnienia.destroy();
@@ -410,7 +408,7 @@ function updateTypZatrudnieniaChart(typZatrudnienia) {
 }
 
 function updateLejekChart(data) {
-    const ctx = document.getElementById('chartLejek').getContext('2d');
+    const ctx = document.getElementById('funnelChart').getContext('2d');
     
     if (charts.lejek) {
         charts.lejek.destroy();
@@ -458,17 +456,12 @@ function updateDetailedStats(data) {
     const totalOfert = data.rekrutacje.reduce((sum, r) => sum + (r.liczba_zlozonych_ofert || 0), 0);
     const totalZatrudnionych = data.rekrutacje.reduce((sum, r) => sum + (r.liczba_zatrudnionych || 0), 0);
     
-    const konwersjaCvSpotkania = totalCV > 0 ? (totalSpotkan / totalCV * 100).toFixed(1) : 0;
-    const konwersjaSpotkaniOferta = totalSpotkan > 0 ? (totalOfert / totalSpotkan * 100).toFixed(1) : 0;
-    const konwersjaOfertaZatrudnienie = totalOfert > 0 ? (totalZatrudnionych / totalOfert * 100).toFixed(1) : 0;
-    
-    document.getElementById('detailedTotalCV').textContent = totalCV;
-    document.getElementById('detailedTotalSpotkan').textContent = totalSpotkan;
-    document.getElementById('detailedTotalOfert').textContent = totalOfert;
-    document.getElementById('detailedTotalZatrudnionych').textContent = totalZatrudnionych;
-    document.getElementById('detailedKonwersjaCvSpotkania').textContent = `${konwersjaCvSpotkania}%`;
-    document.getElementById('detailedKonwersjaSpotkaniOferta').textContent = `${konwersjaSpotkaniOferta}%`;
-    document.getElementById('detailedKonwersjaOfertaZatrudnienie').textContent = `${konwersjaOfertaZatrudnienie}%`;
+    document.getElementById('statCV').textContent = totalCV;
+    document.getElementById('statSpotkan').textContent = totalSpotkan;
+    document.getElementById('statOfert').textContent = totalOfert;
+    document.getElementById('statZatrudnien').textContent = totalZatrudnionych;
+    document.getElementById('statRotacja').textContent = `${data.wskaznik_rotacji}%`;
+    document.getElementById('statEfektywnosc').textContent = `${data.wskaznik_skutecznosci}%`;
 }
 
 // Aktualizuj tabelę departamentów
