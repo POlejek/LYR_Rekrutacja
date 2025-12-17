@@ -1,5 +1,7 @@
 // Dashboard - wersja statyczna z localStorage
 
+const STORAGE_KEY = 'rekrutacje_data';
+
 let currentFilters = {
     dataOd: null,
     dataDo: null,
@@ -11,15 +13,28 @@ let charts = {};
 
 // Pobranie danych z localStorage
 function getData() {
-    const data = localStorage.getItem('rekrutacje');
+    const data = localStorage.getItem(STORAGE_KEY);
     return data ? JSON.parse(data) : [];
 }
 
 // Inicjalizacja
 document.addEventListener('DOMContentLoaded', () => {
+    setDefaultDateRange();
     loadFiltersOptions();
     loadDashboardData();
 });
+
+// Ustaw domyślny zakres dat na maksymalny
+function setDefaultDateRange() {
+    const data = getData();
+    if (data.length === 0) return;
+    
+    const daty = data.map(r => r.data_otwarcia).filter(Boolean).sort();
+    if (daty.length > 0) {
+        document.getElementById('dataOd').value = daty[0];
+        document.getElementById('dataDo').value = daty[daty.length - 1];
+    }
+}
 
 // Załaduj opcje filtrów
 function loadFiltersOptions() {
@@ -104,10 +119,30 @@ function filterData(data) {
 // Załaduj dane dashboardu
 function loadDashboardData() {
     const allData = getData();
-    const data = filterData(calculateMetrics(allData));
+    
+    console.log('All data:', allData.length);
+    
+    if (allData.length === 0) {
+        // Brak danych w localStorage - pokaż komunikat
+        document.querySelectorAll('.stat-value').forEach(el => el.textContent = '0');
+        alert('Brak danych w systemie. Dodaj rekrutacje lub zaimportuj dane z pliku JSON.');
+        return;
+    }
+    
+    const metricsData = calculateMetrics(allData);
+    console.log('After metrics:', metricsData.length);
+    
+    const data = filterData(metricsData);
+    console.log('After filters:', data.length);
     
     if (data.length === 0) {
-        alert('Brak danych do wyświetlenia dla wybranych filtrów');
+        // Brak danych dla wybranych filtrów - pokaż zerowe wartości
+        document.querySelectorAll('.stat-value').forEach(el => el.textContent = '0');
+        document.getElementById('departamentyTableBody').innerHTML = '<tr><td colspan="6" class="text-center">Brak danych dla wybranych filtrów</td></tr>';
+        
+        // Wyczyść wykresy
+        Object.values(charts).forEach(chart => chart.destroy());
+        charts = {};
         return;
     }
     
